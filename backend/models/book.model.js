@@ -1,4 +1,5 @@
 // this file defines the schema for a book in a MongoDB database using Mongoose.
+const mongoose = require("mongoose");
 const BookSchema = new mongoose.Schema(
   {
     title: { type: String, required: true },
