@@ -1,3 +1,10 @@
-
-<router-outlet> <h1> Hello from  App</h1>
-</router-outlet>
+<div class="row">
+    <div class="col-2 ">
+        <app-sidebar></app-sidebar>
+    </div>
+    <div class="col-10 ">
+        <app-header></app-header>
+        <router-outlet></router-outlet>
+        <app-footer></app-footer>
+    </div>
+</div>
