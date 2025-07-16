@@ -1,1 +1,380 @@
-<p>sidebar works!</p>
+<!-- loader Start -->
+<!-- <div id="loading">
+    <div class="loader simple-loader">
+        <div class="loader-body">
+            <img src="assets/images/loader.gif" alt="loader" class="light-loader img-fluid " width="200">
+        </div>
+    </div>
+</div> -->
+<!-- loader END -->
+
+<aside class="sidebar sidebar-base " id="first-tour" data-toggle="main-sidebar" data-sidebar="responsive">
+    <div class="sidebar-header d-flex align-items-center justify-content-start position-relative">
+
+
+
+        <a href="./index.html" class="navbar-brand">
+            <!--Logo start-->
+            <div class="logo-main ">
+                <img class="logo-normal img-fluid " src="assets/images/logo.png" height="30" alt="logo">
+                <img class="logo-color img-fluid " src="assets/images/logo-white.png" height="30" alt="logo">
+                <img class="logo-mini img-fluid" src="assets/images/logo-mini.png" alt="logo">
+                <img class="logo-mini-white img-fluid" src="assets/images/logo-mini-white.png" alt="logo">
+            </div>
+            <!--logo End-->
+        </a>
+
+
+        <div class="sidebar-toggle" data-toggle="sidebar" data-active="true">
+            <i class="icon">
+                <svg class="icon-20 icon-arrow" width="20" viewBox="0 0 24 24" fill="none"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path d="M15.5 19L8.5 12L15.5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                        stroke-linejoin="round"></path>
+                </svg>
+            </i>
+        </div>
+    </div>
+    <div class="sidebar-body pt-0 pb-3 data-scrollbar">
+        <div class="sidebar-list">
+            <!-- Sidebar Menu Start -->
+            <ul class="navbar-nav iq-main-menu sidebar-menu" id="sidebar-menu">
+
+                <li class="nav-item static-item">
+                    <a class="nav-link static-item disabled" href="#">
+                        <span class="default-icon">Main Pages</span>
+                        <i class="sidenav-mini-icon">-</i>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" [routerLink]="['/home']">
+                        <i class="icon" data-bs-toggle="tooltip" title="Home Page" data-bs-placement="right">
+                            <i class="ph-duotone ph-house"></i>
+                        </i>
+                        <i class="sidenav-mini-icon" data-bs-toggle="tooltip" title="Home Page"
+                            data-bs-placement="right">HP</i>
+                        <span class="item-name">Home Page</span>
+                    </a>
+                </li>
+
+                <li class="nav-item iq-drop">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#store" role="button" aria-expanded="false">
+                        <i class="icon" data-bs-toggle="tooltip" title="Store" data-bs-placement="right">
+                            <i class="ph-duotone ph-storefront"></i>
+                        </i>
+                        <span class="item-name">Shop</span>
+                        <i class="right-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" class="icon-18" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
+                                </path>
+                            </svg>
+                        </i>
+                    </a>
+                    <ul class="sub-nav collapse" id="store" data-bs-parent="#sidebar-menu">
+                        <li class="nav-item">
+                            <a class="nav-link" [routerLink]="['/category']" aria-current="page">
+                                <i class="icon" data-bs-toggle="tooltip" title="Category Page"
+                                    data-bs-placement="right">
+                                    <i class="ph-duotone ph-squares-four"></i>
+                                </i>
+                                <i class="sidenav-mini-icon" data-bs-toggle="tooltip" title="Category Page"
+                                    data-bs-placement="right">CP</i>
+                                <span class="item-name">Category Page</span>
+                            </a>
+
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " aria-current="page" href="./shop/book-page.html">
+                                <i class="icon" data-bs-toggle="tooltip" title="Book Page" data-bs-placement="right">
+                                    <i class="ph-duotone ph-book"></i>
+                                </i>
+                                <i class="sidenav-mini-icon" data-bs-toggle="tooltip" title="Book Pages"
+                                    data-bs-placement="right">BP</i>
+                                <span class="item-name">Book Page</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " aria-current="page" href="./shop/book-pdf.html">
+                                <i class="icon" data-bs-toggle="tooltip" title="Book PDF" data-bs-placement="right">
+                                    <i class="ph-duotone ph-file-pdf"></i>
+                                </i>
+                                <i class="sidenav-mini-icon" data-bs-toggle="tooltip" title="Batient PDF"
+                                    data-bs-placement="right">BP</i>
+                                <span class="item-name">Book PDF</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " aria-current="page" href="./shop/checkout.html">
+                                <i class="icon" data-bs-toggle="tooltip" title="Checkout" data-bs-placement="right">
+                                    <i class="ph-duotone ph-shopping-bag"></i>
+                                </i>
+                                <i class="sidenav-mini-icon" data-bs-toggle="tooltip" title="Checkout"
+                                    data-bs-placement="right">C</i>
+                                <span class="item-name">Checkout</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " aria-current="page" href="./shop/wishlist.html">
+                                <i class="icon" data-bs-toggle="tooltip" title="Wishlist" data-bs-placement="right">
+                                    <i class="ph-duotone ph-heart-straight"></i>
+                                </i>
+                                <i class="sidenav-mini-icon" data-bs-toggle="tooltip" title="Wishlist"
+                                    data-bs-placement="right">W</i>
+                                <span class="item-name">wishlist</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="nav-item iq-drop">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#Admin" role="button" aria-expanded="false">
+                        <i class="icon" data-bs-toggle="tooltip" title="Admin" data-bs-placement="right">
+                            <i class="ph-duotone ph-user-circle-gear"></i>
+                        </i>
+                        <span class="item-name">Admin</span>
+                        <i class="right-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" class="icon-18" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
+                                </path>
+                            </svg>
+                        </i>
+                    </a>
+                    <ul class="sub-nav collapse" id="Admin" data-bs-parent="#sidebar-menu">
+                        <li class="nav-item">
+                            <a class="nav-link " aria-current="page" href="./admin/dashboard.html">
+                                <i class="icon" data-bs-toggle="tooltip" title="Dashboard" data-bs-placement="right">
+                                    <i class="ph-duotone ph-gauge"></i>
+                                </i>
+                                <i class="sidenav-mini-icon" data-bs-toggle="tooltip" title="Admin Dashboard"
+                                    data-bs-placement="right">D</i>
+                                <span class="item-name">Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " aria-current="page" href="./admin/category-list.html">
+                                <i class="icon" data-bs-toggle="tooltip" title="Category List"
+                                    data-bs-placement="right">
+                                    <i class="ph-duotone ph-list-plus"></i>
+                                </i>
+                                <i class="sidenav-mini-icon" data-bs-toggle="tooltip" title="Category List"
+                                    data-bs-placement="right">CL</i>
+                                <span class="item-name">Category Lists</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " aria-current="page" href="./admin/author.html">
+                                <i class="icon" data-bs-toggle="tooltip" title="Author" data-bs-placement="right">
+                                    <i class="ph-duotone ph-identification-badge"></i>
+                                </i>
+                                <i class="sidenav-mini-icon" data-bs-toggle="tooltip" title="Author"
+                                    data-bs-placement="right">A</i>
+                                <span class="item-name">Author</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " aria-current="page" href="./admin/books.html">
+                                <i class="icon" data-bs-toggle="tooltip" title="Books" data-bs-placement="right">
+                                    <i class="ph-duotone ph-book-bookmark"></i>
+                                </i>
+                                <i class="sidenav-mini-icon" data-bs-toggle="tooltip" title="Books"
+                                    data-bs-placement="right">B</i>
+                                <span class="item-name">Books</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li>
+                    <hr class="hr-horizontal">
+                </li>
+
+                <li class="nav-item static-item">
+                    <a class="nav-link static-item disabled" href="#">
+                        <span class="default-icon">Pages</span>
+                        <i class="sidenav-mini-icon">-</i>
+                    </a>
+                </li>
+
+                <li class="nav-item iq-drop">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#authentication" role="button"
+                        aria-expanded="false">
+                        <i class="icon" data-bs-toggle="tooltip" title="Authentication" data-bs-placement="right">
+                            <i class="ph-duotone ph-lock-key-open"></i>
+                        </i>
+                        <i class="sidenav-mini-icon" data-bs-toggle="tooltip" title="Authentication"
+                            data-bs-placement="right">
+                            <i class="ph-duotone ph-lock-key-open"></i>
+                        </i>
+                        <span class="item-name">Authentication</span>
+                        <i class="right-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" class="icon-18" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
+                                </path>
+                            </svg>
+                        </i>
+                    </a>
+                    <ul class="sub-nav collapse" id="authentication" data-bs-parent="#pages">
+                        <li class="nav-item">
+                            <a class="nav-link " aria-current="page" href="./auth/sign-in.html">
+                                <i class="icon" data-bs-toggle="tooltip" title="Login" data-bs-placement="right">
+                                    <i class="ph-duotone ph-key"></i>
+                                </i>
+                                <i class="sidenav-mini-icon" data-bs-toggle="tooltip" title="Login"
+                                    data-bs-placement="right">L</i>
+                                <span class="item-name">Login</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " aria-current="page" href="./auth/sign-up.html">
+                                <i class="icon" data-bs-toggle="tooltip" title="Register" data-bs-placement="right">
+                                    <i class="ph-duotone ph-key"></i>
+                                </i>
+                                <i class="sidenav-mini-icon" data-bs-toggle="tooltip" title="Register"
+                                    data-bs-placement="right">R</i>
+                                <span class="item-name">Register</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " aria-current="page" href="./auth/recoverpw.html">
+                                <i class="icon" data-bs-toggle="tooltip" title="Recover Password"
+                                    data-bs-placement="right">
+                                    <i class="ph-duotone ph-voicemail"></i>
+                                </i>
+                                <i class="sidenav-mini-icon" data-bs-toggle="tooltip" title="Recover Password"
+                                    data-bs-placement="right">RP</i>
+                                <span class="item-name">Recover Password</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " aria-current="page" href="./auth/confirm-mail.html">
+                                <i class="icon" data-bs-toggle="tooltip" title="Confirm Mail" data-bs-placement="right">
+                                    <i class="ph-duotone ph-envelope"></i>
+                                </i>
+                                <i class="sidenav-mini-icon" data-bs-toggle="tooltip" title="Confirm Mail"
+                                    data-bs-placement="right">CM</i>
+                                <span class="item-name">Confirm Mail</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " aria-current="page" href="./auth/lock-screen.html">
+                                <i class="icon" data-bs-toggle="tooltip" title="Lock Screen" data-bs-placement="right">
+                                    <i class="ph-duotone ph-lock"></i>
+                                </i>
+                                <i class="sidenav-mini-icon" data-bs-toggle="tooltip" title="Lock Screen"
+                                    data-bs-placement="right">LS</i>
+                                <span class="item-name">Lock Screen</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " aria-current="page" href="./auth/two-factor.html">
+                                <i class="icon" data-bs-toggle="tooltip" title="Two Factor" data-bs-placement="right">
+                                    <i class="ph-duotone ph-lock"></i>
+                                </i>
+                                <i class="sidenav-mini-icon" data-bs-toggle="tooltip" title="Two Factor"
+                                    data-bs-placement="right">TF</i>
+                                <span class="item-name">Two Factor</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " aria-current="page" href="./auth/account-deactivate.html">
+                                <i class="icon" data-bs-toggle="tooltip" title="Account deactivate"
+                                    data-bs-placement="right">
+                                    <i class="ph-duotone ph-lock"></i>
+                                </i>
+                                <i class="sidenav-mini-icon" data-bs-toggle="tooltip" title="Account deactivate"
+                                    data-bs-placement="right">AD</i>
+                                <span class="item-name">Account deactivate</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="nav-item iq-drop">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#user" role="button" aria-expanded="false">
+                        <i class="icon" data-bs-toggle="tooltip" title="User" data-bs-placement="right">
+                            <i class="ph-duotone ph-user"></i>
+                        </i>
+                        <span class="item-name">User</span>
+                        <i class="right-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" class="icon-18" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
+                                </path>
+                            </svg>
+                        </i>
+                    </a>
+                    <ul class="sub-nav collapse" id="user" data-bs-parent="#sidebar-menu">
+                        <li class="nav-item">
+                            <a class="nav-link " aria-current="page" href="./user/user-profile.html">
+                                <i class="icon" data-bs-toggle="tooltip" title="User Profile" data-bs-placement="right">
+                                    <i class="ph-duotone ph-identification-card"></i>
+                                </i>
+
+                                <i class="sidenav-mini-icon" data-bs-toggle="tooltip" title="User Profile"
+                                    data-bs-placement="right">UP</i>
+                                <span class="item-name">User Profile</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " aria-current="page" href="./user/user-edit.html">
+                                <i class="icon" data-bs-toggle="tooltip" title="User Edit" data-bs-placement="right">
+                                    <i class="ph-duotone ph-note-pencil"></i>
+                                </i>
+                                <i class="sidenav-mini-icon" data-bs-toggle="tooltip" title="User Edit"
+                                    data-bs-placement="right">UE</i>
+                                <span class="item-name">User Edit</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " aria-current="page" href="./user/user-add.html">
+                                <i class="icon" data-bs-toggle="tooltip" title="User Add" data-bs-placement="right">
+                                    <i class="ph-duotone ph-plus-circle"></i>
+                                </i>
+                                <i class="sidenav-mini-icon" data-bs-toggle="tooltip" title="User Add"
+                                    data-bs-placement="right">UA</i>
+                                <span class="item-name">User Add</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " aria-current="page" href="./user/user-list.html">
+                                <i class="icon" data-bs-toggle="tooltip" title="User List" data-bs-placement="right">
+                                    <i class="ph-duotone ph-rows"></i>
+                                </i>
+                                <i class="sidenav-mini-icon" data-bs-toggle="tooltip" title="User List"
+                                    data-bs-placement="right">UL</i>
+                                <span class="item-name">User List</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="./index.html">
+                        <i class="icon" data-bs-toggle="tooltip" title="Faq" data-bs-placement="right">
+                            <i class="ph-duotone ph-compass"></i>
+                        </i>
+                        <i class="sidenav-mini-icon" data-bs-toggle="tooltip" title="Faq"
+                            data-bs-placement="right">F</i>
+                        <span class="item-name">FAQ</span>
+                    </a>
+                </li>
+
+                <li>
+                    <hr class="hr-horizontal">
+                </li>
+
+            </ul>
+            <!-- Sidebar Menu End -->
+        </div>
+
+        <div class="p-3 iq-membership mb-5">
+            <img src="assets/images/side-bkg.png" alt="book" class="img-fluid">
+            <!-- <button class="btn w-100 btn-primary mt-4">Become Membership</button> -->
+        </div>
+    </div>
+
+</aside>
