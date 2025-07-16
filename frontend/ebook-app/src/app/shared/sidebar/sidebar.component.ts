@@ -1,4 +1,5 @@
 import { Component, ViewEncapsulation } from '@angular/core';
+import { RouterModule } from '@angular/router';
 import { Dropdown, Collapse, Tooltip } from 'bootstrap';
 
 declare var bootstrap: any;
@@ -6,7 +7,7 @@ declare var bootstrap: any;
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [],
+  imports: [RouterModule],
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.css',
         '../../../assets/css/booksto.min.css',
