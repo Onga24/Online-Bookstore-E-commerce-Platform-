@@ -1,9 +1,11 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, ViewEncapsulation, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { BookService } from '../../../core/services/book.service';
 
 @Component({
   selector: 'app-browse-books',
   standalone: true,
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './browse-books.component.html',
   styleUrls: ['./browse-books.component.css',
               '../../../../assets/css/booksto.min.css',
@@ -24,6 +26,14 @@ import { Component, ViewEncapsulation } from '@angular/core';
   encapsulation: ViewEncapsulation.None,
   
 })
-export class BrowseBooksComponent {
+export class BrowseBooksComponent implements OnInit {
+  books: any[] = [];
 
+  constructor(private bookService: BookService) {}
+
+  ngOnInit(): void {
+    this.bookService.getBooks().subscribe((data: any[]) => {
+      this.books = data;
+    });
+  }
 }

@@ -1,1 +1,14 @@
-<p>book-list works!</p>
+<div class="row">
+  <div class="col-md-4" *ngFor="let book of books">
+    <div class="card mb-3">
+      <div class="card-body">
+        <h5 class="card-title">{{ book.title || 'No Title' }}</h5>
+        <h6 class="card-subtitle mb-2 text-muted">{{ book.author || 'Unknown Author' }}</h6>
+        <p class="card-text">Price: ${{ book.price || 'N/A' }}</p>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="books.length === 0" class="col-12 text-center">
+    <p>No books found.</p>
+  </div>
+</div>
