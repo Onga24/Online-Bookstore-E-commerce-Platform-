@@ -20,10 +20,10 @@ export const routes: Routes = [
     {path: 'category' , component: CategoryComponent},
     {path: 'wishlist' , component: WishlistComponent},
     {path: 'cart' , component: CartComponent},
-    {path: '**' , component: HomeComponent},
-        {path: 'head' , component: HeaderComponent},
+    {path: 'head' , component: HeaderComponent},
     {path: 'side' , component: SidebarComponent},
     {path: 'foot' , component: FooterComponent},
     {path: 'cart' , component: CartComponent},
-    { path: 'orders-items', component: OrdersItemsComponent }
+    { path: 'orders-items', component: OrdersItemsComponent },
+    {path: '**' , component: HomeComponent},
   ]
