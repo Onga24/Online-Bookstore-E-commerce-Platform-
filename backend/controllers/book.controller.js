@@ -1,17 +1,89 @@
+// book.controller.js
+
 const Book = require("../models/book.model");
+const fs = require("fs");
+const pdfParse = require('pdf-parse');
+const path = require('path');
+const multer = require('multer');
+require('dotenv').config();
+
+// --- CORRECTED COHERE API INITIALIZATION ---
+// This is the most common and current way to initialize for cohere-ai versions 5.x.x and newer.
+// It uses a named import `CohereClient` from the package.
+const { CohereClient } = require('cohere-ai');
+const cohere = new CohereClient({
+    token: process.env.COHERE_API_KEY, // Ensure COHERE_API_KEY is in your .env file
+});
+
+
+// Helper function to save base64 encoded images to disk
+function saveBase64Image(base64String, uploadDir) {
+    // ... (rest of the saveBase64Image function remains the same) ...
+    const matches = base64String.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+    if (!matches || matches.length !== 3) {
+        throw new Error('Invalid base64 image string format.');
+    }
+
+    const imageType = matches[1];
+    const imageData = matches[2];
+
+    let fileExtension;
+    if (imageType.includes('image/png')) {
+        fileExtension = 'png';
+    } else if (imageType.includes('image/jpeg')) {
+        fileExtension = 'jpeg';
+    } else if (imageType.includes('image/jpg')) {
+        fileExtension = 'jpg';
+    } else {
+        throw new Error(`Unsupported image type: ${imageType}`);
+    }
+
+    const filename = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${fileExtension}`;
+    const filePath = path.join(uploadDir, filename);
+
+    if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
+    }
+
+    fs.writeFileSync(filePath, Buffer.from(imageData, 'base64'));
+
+    return `/uploads/images/${filename}`;
+}
+
 
 async function extractBookInfoWithCohere(text) {
     try {
-        // Limit text length to avoid hitting Cohere's token limits and for performance
-        // Consider increasing if you find crucial info is often beyond 6000 chars,
-        // but be mindful of costs and latency.
-        const limitedText = text.substring(0, 8000); // Increased slightly for more potential info
+        const limitedText = text.substring(0, 8000);
 
-        // --- MODIFIED PROMPT ---
+        const allowedCategories = [
+            "Fiction",
+            "Non-fiction",
+            "Science Fiction",
+            "Fantasy",
+            "Mystery",
+            "Thriller",
+            "Horror",
+            "Romance",
+            "Drama",
+            "Comedy",
+            "History",
+            "Science",
+            "Technology",
+            "Education",
+            "Self-help",
+            "Business",
+            "Art",
+            "Cooking",
+            "Travel",
+            "Health"
+           
+        ];
+
         const prompt = `Given the following book content, extract the TITLE, AUTHOR, DESCRIPTION, CATEGORY, PUBLISHER and PUBLICATION_DATE.
     If a field is not explicitly found, state "Not Found".
-    try to extract it in 'MM-DD-YYYY' format if possible, otherwise 'Not Found'.
+    try to extract PUBLICATION_DATE in 'MM-DD-YYYY' format if possible, otherwise 'Not Found'.
     For PRICE, extract the numerical value only (e.g., "29.99" not "$29.99"). If not found, state "Not Found".
+    For CATEGORY, choose only from the following list: ${allowedCategories.join(', ')}. If the content does not clearly fit any of these, state "Not Found".
     Be concise. Do not include any other text or explanation. Only provide the JSON object.
 
     Content:
@@ -25,14 +97,16 @@ async function extractBookInfoWithCohere(text) {
       "category": "...",
       "publisher": "...",
       "publicationDate": "...",
-      "price": "..." 
+      "price": "..."
     }`;
 
-        const response = await cohere.generate({
+        // Ensure 'cohere' object is correctly initialized before calling generate
+        // The generate method is typically directly on the CohereClient instance
+        const response = await cohere.generate({ // Use 'cohere' directly here
             prompt: prompt,
-            max_tokens: 370, // May need to increase max_tokens slightly if output gets longer
-            temperature: 0.3, // Keep temperature low for more deterministic extraction
-            stop_sequences: ["}"], // Stop when the closing JSON brace is found
+            max_tokens: 370,
+            temperature: 0.3,
+            stop_sequences: ["}"],
         });
 
         if (
@@ -49,8 +123,8 @@ async function extractBookInfoWithCohere(text) {
                 author: "Not Found",
                 description: "Not Found",
                 category: "Not Found",
-                publisher: "Not Found", // Add new fields
-                publicationDate: "Not Found", // Add new fields
+                publisher: "Not Found",
+                publicationDate: "Not Found",
                 price: "Not Found",
             };
         }
@@ -110,9 +184,9 @@ async function extractBookInfoWithCohere(text) {
         ) {
             extractedPrice = parseFloat(
                 String(extractedPrice).replace(/[^0-9.]/g, "")
-            ); // Remove non-numeric chars except dot, then parse
+            );
             if (isNaN(extractedPrice)) {
-                extractedPrice = "Not Found"; // If parsing failed, set to "Not Found"
+                extractedPrice = "Not Found";
             }
         } else {
             extractedPrice = "Not Found";
@@ -124,6 +198,7 @@ async function extractBookInfoWithCohere(text) {
             extractedPublicationDate !== undefined &&
             extractedPublicationDate !== null
         ) {
+            // No specific formatting logic here, just pass it through
         } else {
             extractedPublicationDate = "Not Found";
         }
@@ -133,8 +208,8 @@ async function extractBookInfoWithCohere(text) {
             author: parsedData.author || "Not Found",
             description: parsedData.description || "Not Found",
             category: parsedData.category || "Not Found",
-            publisher: parsedData.publisher || "Not Found", // Add new fields
-            publicationDate: extractedPublicationDate, // Will be MM-DD-YYYY string or "Not Found"
+            publisher: parsedData.publisher || "Not Found",
+            publicationDate: extractedPublicationDate,
             price: extractedPrice,
         };
     } catch (error) {
@@ -160,7 +235,7 @@ async function extractBookInfoWithCohere(text) {
     }
 }
 
-// --- Controller Method: Process PDF and Get Data ---
+// Controller Method: Process PDF and Get Data
 exports.processPdfForAutofill = async (req, res) => {
     if (!req.file) {
         return res.status(400).json({ message: "No PDF file uploaded." });
@@ -173,7 +248,9 @@ exports.processPdfForAutofill = async (req, res) => {
         const pdfData = await pdfParse(dataBuffer);
 
         if (!pdfData || !pdfData.text) {
-            fs.unlinkSync(pdfPath); // Clean up temp file
+            if (fs.existsSync(pdfPath)) {
+                fs.unlinkSync(pdfPath);
+            }
             return res
                 .status(400)
                 .json({ message: "Could not extract text from PDF." });
@@ -182,13 +259,16 @@ exports.processPdfForAutofill = async (req, res) => {
         const extractedText = pdfData.text;
         const bookInfo = await extractBookInfoWithCohere(extractedText);
 
-        fs.unlinkSync(pdfPath); // Clean up temp file
+        if (fs.existsSync(pdfPath)) {
+            fs.unlinkSync(pdfPath);
+        }
 
         res.status(200).json(bookInfo);
     } catch (error) {
         console.error("Error in processPdfForAutofill:", error);
         if (req.file && fs.existsSync(pdfPath)) {
-            fs.unlinkSync(pdfPath); // Ensure temp file is cleaned on error
+            fs.unlinkSync(pdfPath);
+            console.log(`Cleaned up temp PDF file on error: ${pdfPath}`);
         }
         res.status(500).json({
             message: "Failed to process PDF for autofill.",
@@ -197,111 +277,13 @@ exports.processPdfForAutofill = async (req, res) => {
     }
 };
 
-// --- Add Book Controller ---
-// exports.addBook = async (req, res) => {
-//     try {
-//         console.log("Backend: Attempting to add a new book.");
-
-//         // Destructure necessary fields from req.body
-//         const {
-//             title,
-//             author,
-//             description,
-//             category,
-//             price,
-//             publisher,
-//             publicationDate,
-//             // imageBase64 comes from req.body for base64 image uploads
-//             // pdf comes via req.file from Multer
-//             imageBase64,
-//         } = req.body;
-
-//         let pdfUrl = null;
-//         let coverImage = null;
-
-//         // --- Handle PDF File Logic (from req.file, handled by Multer) ---
-//         // If a PDF file was uploaded with the request, req.file will contain its details.
-
-//         if (req.file) {
-//             const pdfFileName = req.file.filename;
-//             const publicPdfUrl = `/uploads/pdfs/${pdfFileName}`;
-//             bookData.pdfUrl = publicPdfUrl;
-//             console.log(
-//                 `Backend: PDF file processed, public URL: ${publicPdfUrl}`
-//             );
-//         } else {
-//             console.log(
-//                 "Backend: No PDF file found in req.file for this request."
-//             );
-//         }
-
-//         // --- Handle Cover Image Logic (Base64) ---
-//         // If imageBase64 string is provided, save it as a file.
-//         if (imageBase64) {
-//             console.log("Backend: Base64 cover image detected for new book.");
-//             const imageUploadDir = path.join(
-//                 __dirname,
-//                 "../public/uploads/images"
-//             );
-//             // Ensure the directory exists before saving
-//             if (!fs.existsSync(imageUploadDir)) {
-//                 fs.mkdirSync(imageUploadDir, { recursive: true });
-//             }
-//             coverImage = saveBase64Image(imageBase64, imageUploadDir); // This helper saves the image and returns its relative path
-//             console.log(`Backend: New cover image path created: ${coverImage}`);
-//         }
-
-//         // Create a new Book instance with the received data and file URLs
-//         const newBook = new Book({
-//             title,
-//             author,
-//             description,
-//             category,
-//             price,
-//             publisher,
-//             publicationDate,
-//             pdfUrl: pdfUrl, // Assign the constructed PDF URL
-//             coverImage: coverImage, // Assign the constructed cover image URL
-//         });
-
-//         // Save the new book document to MongoDB
-//         const savedBook = await newBook.save();
-//         console.log(`Backend: Successfully added new book: ${savedBook.title}`);
-
-//         // Send a success response with the newly created book data
-//         res.status(201).json({
-//             message: "Book added successfully",
-//             book: savedBook,
-//         });
-//     } catch (err) {
-//         console.error("Backend: Error adding book:", err);
-
-//         // If a file was uploaded by Multer and an error occurred during saving the book to DB,
-//         // delete the uploaded file to prevent orphaned files.
-//         if (req.file && fs.existsSync(req.file.path)) {
-//             fs.unlinkSync(req.file.path);
-//             console.log(
-//                 `Backend: Cleaned up uploaded PDF file on add error: ${req.file.path}`
-//             );
-//         }
-//         // Also consider cleaning up the image file if it was saved by saveBase64Image
-//         // and an error occurred AFTER that but BEFORE book.save()
-
-//         // Handle Mongoose validation errors specifically
-//         if (err.name === "ValidationError") {
-//             return res.status(400).json({ message: err.message });
-//         }
-//         // Generic error response
-//         res.status(500).json({ error: err.message || "Failed to add book." });
-//     }
-// };
+// Add Book Controller
 exports.addBook = async (req, res) => {
     try {
         console.log("Backend: Attempting to add a new book.");
-        console.log("Received req.body:", req.body); // Check all form text fields
-        console.log("Received req.file:", req.file); // THIS IS CRUCIAL FOR PDF
+        console.log("Received req.body:", req.body);
+        console.log("Received req.file:", req.file);
 
-        // Destructure necessary fields from req.body
         const {
             title,
             author,
@@ -311,9 +293,8 @@ exports.addBook = async (req, res) => {
             publisher,
             publicationDate,
         } = req.body;
-        const imageBase64 = req.body.imageBase64; // Will be null, empty string, or base64 string
+        const imageBase64 = req.body.imageBase64;
 
-        // Initialize book data object
         const bookData = {
             title,
             author,
@@ -324,43 +305,31 @@ exports.addBook = async (req, res) => {
             publicationDate,
         };
 
-        // --- Handle PDF File Logic ---
-        // req.file exists if a new PDF was uploaded
+        let savedImagePath = null;
+
+        // Handle PDF File Logic
         if (req.file) {
             console.log("Backend: New PDF file detected.");
-            // For adding, we just set the new PDF URL, no old one to delete
-            bookData.pdfUrl = `/uploads/pdfs/${req.file.filename}`; // Set new PDF URL
-        }
-        // IMPORTANT: For 'add', if req.file is null, and req.body.pdf is explicitly empty string,
-        // it means no PDF was chosen or it was explicitly cleared. In this case, pdfUrl remains null (default).
-        else {
-            console.log(
-                "Backend: No PDF file found in req.file for this request, setting pdfUrl to null."
-            );
-            bookData.pdfUrl = null; // Explicitly set to null if no file uploaded
+            bookData.pdfUrl = `/uploads/pdfs/${req.file.filename}`;
+        } else {
+            console.log("Backend: No PDF file found in req.file for this request, setting pdfUrl to null.");
+            bookData.pdfUrl = null;
         }
 
-        // --- Handle Cover Image Logic (Base64) ---
-        // imageBase64 exists if a new image was uploaded (base64 string)
+        // Handle Cover Image Logic (Base64)
         if (imageBase64) {
             console.log("Backend: New Base64 cover image detected.");
             const imageUploadDir = path.join(
                 __dirname,
                 "../public/uploads/images"
             );
-            // saveBase64Image already handles directory creation
-            bookData.coverImage = saveBase64Image(imageBase64, imageUploadDir); // Save new image
-        }
-        // IMPORTANT: For 'add', if imageBase64 is null, and req.body.imageBase64 is explicitly empty string,
-        // it means no image was chosen or it was explicitly cleared. In this case, coverImage remains null (default).
-        else {
-            console.log(
-                "Backend: No Base64 cover image found, setting coverImage to null."
-            );
-            bookData.coverImage = null; // Explicitly set to null if no image uploaded
+            savedImagePath = saveBase64Image(imageBase64, imageUploadDir);
+            bookData.coverImage = savedImagePath;
+        } else {
+            console.log("Backend: No Base64 cover image found, setting coverImage to null.");
+            bookData.coverImage = null;
         }
 
-        // Create a new Book instance with the collected data
         const newBook = new Book(bookData);
         const savedBook = await newBook.save();
 
@@ -368,18 +337,19 @@ exports.addBook = async (req, res) => {
         res.status(201).json(savedBook);
     } catch (error) {
         console.error("Backend: Error adding book:", error);
-        // If a new PDF file was uploaded by Multer before an error occurred, delete it.
-        // This cleans up orphaned files if the DB save fails.
+
         if (req.file && fs.existsSync(req.file.path)) {
             fs.unlinkSync(req.file.path);
-            console.log(
-                `Backend: Cleaned up temp PDF file on add error: ${req.file.path}`
-            );
+            console.log(`Backend: Cleaned up uploaded PDF file on add error: ${req.file.path}`);
         }
+
+        if (savedImagePath && fs.existsSync(path.join(__dirname, '../public', savedImagePath))) {
+            fs.unlinkSync(path.join(__dirname, '../public', savedImagePath));
+            console.log(`Backend: Cleaned up uploaded image file on add error: ${savedImagePath}`);
+        }
+
         if (error instanceof multer.MulterError) {
-            return res
-                .status(400)
-                .json({ message: "Multer Error: " + error.message });
+            return res.status(400).json({ message: "Multer Error: " + error.message });
         }
         if (error.name === "ValidationError") {
             return res.status(400).json({ message: error.message });
@@ -391,20 +361,21 @@ exports.addBook = async (req, res) => {
     }
 };
 
-// --- Get All Books Controller ---
+// Get All Books Controller
 exports.getAllBooks = async (req, res) => {
     try {
         const books = await Book.find();
-        // Prepend full host URL for accessibility
         const booksWithFullUrls = books.map((book) => {
+            const protocol = req.protocol || (req.headers['x-forwarded-proto'] || 'http');
+            const host = req.headers.host;
+
             return {
                 ...book.toObject(),
-                // Ensure req.headers.host is used for constructing full URLs for the frontend
                 pdfUrl: book.pdfUrl
-                    ? `http://${req.headers.host}${book.pdfUrl}`
+                    ? `${protocol}://${host}${book.pdfUrl}`
                     : null,
                 coverImage: book.coverImage
-                    ? `http://${req.headers.host}${book.coverImage}`
+                    ? `${protocol}://${host}${book.coverImage}`
                     : null,
             };
         });
@@ -415,7 +386,7 @@ exports.getAllBooks = async (req, res) => {
     }
 };
 
-// --- NEW: Get Book by ID Controller (For Edit Form) ---
+// Get Book by ID Controller (For Edit Form)
 exports.getBookById = async (req, res) => {
     try {
         const { id } = req.params;
@@ -427,14 +398,16 @@ exports.getBookById = async (req, res) => {
             return res.status(404).json({ message: "Book not found." });
         }
 
-        // Prepend full host URL for the frontend for existing files
+        const protocol = req.protocol || (req.headers['x-forwarded-proto'] || 'http');
+        const host = req.headers.host;
+
         const bookWithFullUrls = {
             ...book.toObject(),
             pdfUrl: book.pdfUrl
-                ? `http://${req.headers.host}${book.pdfUrl}`
+                ? `${protocol}://${host}${book.pdfUrl}`
                 : null,
             coverImage: book.coverImage
-                ? `http://${req.headers.host}${book.coverImage}`
+                ? `${protocol}://${host}${book.coverImage}`
                 : null,
         };
 
@@ -443,20 +416,18 @@ exports.getBookById = async (req, res) => {
     } catch (err) {
         console.error("Backend: Error fetching book by ID:", err);
         if (err.name === "CastError") {
-            // Mongoose error for invalid ID format
             return res.status(400).json({ message: "Invalid book ID format." });
         }
         res.status(500).json({ error: err.message || "Failed to fetch book." });
     }
 };
 
-// --- UPDATED: Update Book Controller ---
+// Update Book Controller
 exports.updateBook = async (req, res) => {
     try {
         const { id } = req.params;
         console.log(`Backend: Attempting to update book with ID: ${id}`);
 
-        // Destructure necessary fields from req.body
         const {
             title,
             author,
@@ -466,17 +437,14 @@ exports.updateBook = async (req, res) => {
             publisher,
             publicationDate,
         } = req.body;
-        // imageBase64 will be directly used for new uploads or null/empty string for removal
-        const imageBase64 = req.body.imageBase64; // Will be null, empty string, or base64 string
+        const imageBase64 = req.body.imageBase64;
 
-        // Find the existing book to get current file paths and potentially delete old files
         const existingBook = await Book.findById(id);
         if (!existingBook) {
             console.log(`Backend: Book with ID ${id} not found for update.`);
             return res.status(404).json({ message: "Book not found." });
         }
 
-        // Prepare fields to update
         const updateFields = {
             title,
             author,
@@ -487,115 +455,81 @@ exports.updateBook = async (req, res) => {
             publicationDate,
         };
 
-        // --- Handle PDF File Logic ---
-        // req.file exists if a new PDF was uploaded
+        let newSavedImagePath = null;
+
+        // Handle PDF File Logic
         if (req.file) {
-            console.log("Backend: New PDF file detected.");
-            // Delete old PDF if it exists
+            console.log("Backend: New PDF file detected during update.");
             if (existingBook.pdfUrl) {
-                const oldPdfPath = path.join(
-                    __dirname,
-                    "../public",
-                    existingBook.pdfUrl
-                );
+                const oldPdfPath = path.join(__dirname, "../public", existingBook.pdfUrl);
                 if (fs.existsSync(oldPdfPath)) {
-                    fs.unlinkSync(oldPdfPath);
-                    console.log(`Backend: Deleted old PDF: ${oldPdfPath}`);
+                    try {
+                        fs.unlinkSync(oldPdfPath);
+                        console.log(`Backend: Deleted old PDF: ${oldPdfPath}`);
+                    } catch (unlinkErr) {
+                        console.error(`Error deleting old PDF file ${oldPdfPath}:`, unlinkErr);
+                    }
                 }
             }
-            updateFields.pdfUrl = `/uploads/pdfs/${req.file.filename}`; // Set new PDF URL
-        }
-        // Check if the frontend explicitly sent 'pdf' as an empty string (meaning "remove current PDF")
-        // Frontend sends an empty string for the 'pdf' FormData field when user clears the file input
-        else if (req.body.pdf === "") {
-            // IMPORTANT: Check for empty string (or 'null' as string) from FormData
-            console.log("Backend: PDF explicitly marked for removal.");
+            updateFields.pdfUrl = `/uploads/pdfs/${req.file.filename}`;
+        } else if (req.body.pdf === "") {
+            console.log("Backend: PDF explicitly marked for removal during update.");
             if (existingBook.pdfUrl) {
-                const oldPdfPath = path.join(
-                    __dirname,
-                    "../public",
-                    existingBook.pdfUrl
-                );
+                const oldPdfPath = path.join(__dirname, "../public", existingBook.pdfUrl);
                 if (fs.existsSync(oldPdfPath)) {
-                    fs.unlinkSync(oldPdfPath);
-                    console.log(
-                        `Backend: Deleted old PDF due to explicit client request: ${oldPdfPath}`
-                    );
+                    try {
+                        fs.unlinkSync(oldPdfPath);
+                        console.log(`Backend: Deleted old PDF due to explicit client request: ${oldPdfPath}`);
+                    } catch (unlinkErr) {
+                        console.error(`Error deleting old PDF file ${oldPdfPath}:`, unlinkErr);
+                    }
                 }
             }
-            updateFields.pdfUrl = null; // Set PDF URL to null in DB
+            updateFields.pdfUrl = null;
         }
-        // If req.file is null and req.body.pdf is not an empty string,
-        // it means the PDF was not touched, so pdfUrl in updateFields remains undefined,
-        // and Mongoose will not update it, preserving the existing one.
 
-        // --- Handle Cover Image Logic (Base64) ---
-        // imageBase64 exists if a new image was uploaded (base64 string)
+        // Handle Cover Image Logic (Base64)
         if (imageBase64) {
-            console.log("Backend: New Base64 cover image detected.");
-            // Delete old image if it exists
+            console.log("Backend: New Base64 cover image detected during update.");
             if (existingBook.coverImage) {
-                const oldImagePath = path.join(
-                    __dirname,
-                    "../public",
-                    existingBook.coverImage
-                );
+                const oldImagePath = path.join(__dirname, "../public", existingBook.coverImage);
                 if (fs.existsSync(oldImagePath)) {
-                    fs.unlinkSync(oldImagePath);
-                    console.log(
-                        `Backend: Deleted old cover image: ${oldImagePath}`
-                    );
+                    try {
+                        fs.unlinkSync(oldImagePath);
+                        console.log(`Backend: Deleted old cover image: ${oldImagePath}`);
+                    } catch (unlinkErr) {
+                        console.error(`Error deleting old cover image ${oldImagePath}:`, unlinkErr);
+                    }
                 }
             }
-            const imageUploadDir = path.join(
-                __dirname,
-                "../public/uploads/images"
-            );
-            if (!fs.existsSync(imageUploadDir)) {
-                fs.mkdirSync(imageUploadDir, { recursive: true });
-            }
-            updateFields.coverImage = saveBase64Image(
-                imageBase64,
-                imageUploadDir
-            ); // Save new image
-        }
-        // Check if the frontend explicitly sent 'imageBase64' as an empty string (meaning "remove current image")
-        else if (req.body.imageBase64 === "") {
-            // IMPORTANT: Check for empty string (or 'null' as string) from FormData
-            console.log("Backend: Cover image explicitly marked for removal.");
+            const imageUploadDir = path.join(__dirname, "../public/uploads/images");
+            newSavedImagePath = saveBase64Image(imageBase64, imageUploadDir);
+            updateFields.coverImage = newSavedImagePath;
+        } else if (req.body.imageBase64 === "") {
+            console.log("Backend: Cover image explicitly marked for removal during update.");
             if (existingBook.coverImage) {
-                const oldImagePath = path.join(
-                    __dirname,
-                    "../public",
-                    existingBook.coverImage
-                );
+                const oldImagePath = path.join(__dirname, "../public", existingBook.coverImage);
                 if (fs.existsSync(oldImagePath)) {
-                    fs.unlinkSync(oldImagePath);
-                    console.log(
-                        `Backend: Deleted old cover image due to explicit client request: ${oldImagePath}`
-                    );
+                    try {
+                        fs.unlinkSync(oldImagePath);
+                        console.log(`Backend: Deleted old cover image due to explicit client request: ${oldImagePath}`);
+                    } catch (unlinkErr) {
+                        console.error(`Error deleting old cover image ${oldImagePath}:`, unlinkErr);
+                    }
                 }
             }
-            updateFields.coverImage = null; // Set coverImage to null in DB
+            updateFields.coverImage = null;
         }
-        // If imageBase64 is undefined/null and req.body.imageBase64 is not an empty string,
-        // it means the image was not touched, so coverImage in updateFields remains undefined,
-        // preserving the existing one.
 
-        // Perform the update
         const updatedBook = await Book.findByIdAndUpdate(
             id,
-            updateFields, // Use the prepared fields
-            { new: true, runValidators: true } // Return the updated document and run Mongoose validators
+            updateFields,
+            { new: true, runValidators: true }
         );
 
         if (!updatedBook) {
-            console.log(
-                `Backend: Book with ID ${id} not found after update attempt (this shouldn't happen if existingBook was found).`
-            );
-            return res
-                .status(404)
-                .json({ message: "Book not found after update attempt." });
+            console.log(`Backend: Book with ID ${id} not found after update attempt.`);
+            return res.status(404).json({ message: "Book not found after update attempt." });
         }
 
         console.log(`Backend: Successfully updated book: ${updatedBook.title}`);
@@ -605,13 +539,25 @@ exports.updateBook = async (req, res) => {
         });
     } catch (err) {
         console.error("Backend: Error updating book:", err);
-        // If a new file was uploaded during the update and an error occurred, delete it.
+
         if (req.file && fs.existsSync(req.file.path)) {
-            fs.unlinkSync(req.file.path);
-            console.log(
-                `Backend: Cleaned up temp PDF file on update error: ${req.file.path}`
-            );
+            try {
+                fs.unlinkSync(req.file.path);
+                console.log(`Backend: Cleaned up new PDF file on update error: ${req.file.path}`);
+            } catch (unlinkErr) {
+                console.error(`Error cleaning up new PDF file ${req.file.path}:`, unlinkErr);
+            }
         }
+
+        if (newSavedImagePath && fs.existsSync(path.join(__dirname, '../public', newSavedImagePath))) {
+            try {
+                fs.unlinkSync(path.join(__dirname, '../public', newSavedImagePath));
+                console.log(`Backend: Cleaned up new image file on update error: ${newSavedImagePath}`);
+            } catch (unlinkErr) {
+                console.error(`Error cleaning up new image file ${newSavedImagePath}:`, unlinkErr);
+            }
+        }
+
         if (err.name === "CastError") {
             return res.status(400).json({ message: "Invalid book ID format." });
         }
@@ -624,7 +570,7 @@ exports.updateBook = async (req, res) => {
     }
 };
 
-// --- UPDATED: Delete Book Controller ---
+// Delete Book Controller
 exports.deleteBook = async (req, res) => {
     try {
         const { id } = req.params;
@@ -645,8 +591,12 @@ exports.deleteBook = async (req, res) => {
                 bookToDelete.pdfUrl
             );
             if (fs.existsSync(pdfFilePath)) {
-                fs.unlinkSync(pdfFilePath);
-                console.log(`Backend: Deleted PDF file: ${pdfFilePath}`);
+                try {
+                    fs.unlinkSync(pdfFilePath);
+                    console.log(`Backend: Deleted PDF file: ${pdfFilePath}`);
+                } catch (err) {
+                    console.error(`Error deleting PDF file ${pdfFilePath}:`, err);
+                }
             } else {
                 console.log(
                     `Backend: PDF file not found at path for deletion: ${pdfFilePath}`
@@ -662,10 +612,14 @@ exports.deleteBook = async (req, res) => {
                 bookToDelete.coverImage
             );
             if (fs.existsSync(imageFilePath)) {
-                fs.unlinkSync(imageFilePath);
-                console.log(
-                    `Backend: Deleted cover image file: ${imageFilePath}`
-                );
+                try {
+                    fs.unlinkSync(imageFilePath);
+                    console.log(
+                        `Backend: Deleted cover image file: ${imageFilePath}`
+                    );
+                } catch (err) {
+                    console.error(`Error deleting cover image file ${imageFilePath}:`, err);
+                }
             } else {
                 console.log(
                     `Backend: Cover image file not found at path for deletion: ${imageFilePath}`

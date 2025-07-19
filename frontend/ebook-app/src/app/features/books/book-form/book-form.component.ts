@@ -23,6 +23,7 @@ import { Subscription } from 'rxjs'; // For managing subscriptions to Observable
 
 // --- Service Import ---
 // Adjust path if needed based on your project structure
+// IMPORTANT: Using BookData and Partial<BookData> as per YOUR provided service
 import { BookService, BookData } from '../../../core/services/book.service';
 
 @Component({
@@ -45,10 +46,11 @@ export class BookFormComponent implements OnInit, OnDestroy {
   successMessage: string = '';
   showScrollTop = false;
   imageTouched: boolean = false; // Tracks if the image input has been interacted with (for validation display)
+  isLoading: boolean = false; // Controls the loading overlay and form disable/visibility state
 
   // ViewChild references to access native HTML input elements (e.g., to clear their value)
   @ViewChild('imageInput') imageInput!: ElementRef<HTMLInputElement>;
-  @ViewChild('pdfInput') pdfInput!: ElementRef<HTMLInputElement>;
+  @ViewChild('pdfInput') pdfInput!: ElementRef<HTMLInputElement>; // Keep this if you use it in HTML for main PDF upload
   @ViewChild('pdfAutofillInput')
   pdfAutofillInput!: ElementRef<HTMLInputElement>;
 
@@ -101,16 +103,11 @@ export class BookFormComponent implements OnInit, OnDestroy {
     this.bookService.scrollToTop();
   }
 
-  /**
-   * Handles the change event for the cover image input.
-   * Converts the selected image file to a Base64 string for preview and submission.
-   * @param event The DOM change event.
-   */
   onImageChange(event: Event) {
     this.imageTouched = true; // Mark image input as touched for validation display
     const file = (event.target as HTMLInputElement).files?.[0]; // Get the selected file
-
     if (file) {
+      // No isLoading = true here as convertToBase64 is client-side and typically fast.
       this.bookService.convertToBase64(file).subscribe({
         next: (base64String) => {
           this.imgSrc = base64String; // Store the Base64 string for preview and later submission
@@ -119,6 +116,7 @@ export class BookFormComponent implements OnInit, OnDestroy {
           console.error('Error converting image to base64:', err);
           this.imgSrc = ''; // Clear image source on error
           this.bookService.setFeedbackMessage('❌ Error processing image.');
+          // Do NOT set isLoading here. This operation doesn't affect overall form loading.
         },
       });
     } else {
@@ -126,30 +124,8 @@ export class BookFormComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Handles the change event for the main PDF file input.
-   * Stores the selected PDF File object for submission.
-   * @param event The DOM change event.
-   */
-  // onPDFChange(event: Event) {
-  //   const file = (event.target as HTMLInputElement).files?.[0]; // Get the selected file
-
-  //   if (file && file.type === 'application/pdf') {
-  //     this.pdfFile = file; // Store the File object
-  //     console.log('PDF file selected for final submission:', this.pdfFile.name);
-  //   } else {
-  //     alert("Only PDF files are allowed for final submission.");
-  //     this.pdfFile = null; // Clear the stored file
-  //     // Optionally clear the native file input element
-  //     if (this.pdfInput) {
-  //       this.pdfInput.nativeElement.value = '';
-  //     }
-  //     this.bookService.setFeedbackMessage('❌ Only PDF files are allowed for final upload.');
-  //   }
-  // }
   onPDFChange(event: Event) {
     const file = (event.target as HTMLInputElement).files?.[0];
-
     if (file && file.type === 'application/pdf') {
       this.pdfFile = file; // <-- this correctly assigns the File object
       console.log('PDF file selected for final submission:', this.pdfFile.name);
@@ -159,29 +135,25 @@ export class BookFormComponent implements OnInit, OnDestroy {
       if (this.pdfInput) {
         this.pdfInput.nativeElement.value = '';
       }
+      // Do NOT set isLoading here. This is a client-side file validation, not an async operation.
       this.bookService.setFeedbackMessage(
         '❌ Only PDF files are allowed for final upload.'
       );
     }
   }
-  /**
-   * Handles the change event for the PDF autofill input.
-   * Stores the selected PDF File object and triggers the autofill process.
-   * @param event The DOM change event.
-   */
+
   onPDFAutofillChange(event: Event) {
     const file = (event.target as HTMLInputElement).files?.[0]; // Get the selected file
-
     if (file && file.type === 'application/pdf') {
       this.pdfFileForAutofill = file; // Store the File object for autofill
       this.processPdfForFormFill(); // Call the autofill processing method
     } else {
       alert('Please select a PDF file to auto-fill the form.');
       this.pdfFileForAutofill = null; // Clear the stored file
-      // Optionally clear the native file input element
       if (this.pdfAutofillInput) {
         this.pdfAutofillInput.nativeElement.value = '';
       }
+      // Do NOT set isLoading here. This is a client-side file validation, not an async operation.
       this.bookService.setFeedbackMessage(
         '❌ Please select a valid PDF to auto-fill.'
       );
@@ -197,25 +169,35 @@ export class BookFormComponent implements OnInit, OnDestroy {
       return;
     }
 
+    this.isLoading = true; // Set loading to true as an API call is about to start
     this.bookService.setFeedbackMessage('⏳ Processing PDF, please wait...');
+
+    // Now uses Partial<BookData> as per your BookService's return type for processPdfForAutofill
     this.bookService.processPdfForAutofill(this.pdfFileForAutofill).subscribe({
-      next: (extractedData) => {
+      next: (extractedData: Partial<BookData>) => {
+        // Use Partial<BookData>
         // Patch the form values with data extracted from the PDF
         this.Bookform.patchValue({
+          // Safely access properties, using empty string if undefined
           title: extractedData.title || '',
           author: extractedData.author || '',
           description: extractedData.description || '',
           category: extractedData.category || '',
-          // Preserve existing price, publisher, publicationDate if not extracted
-          price: this.Bookform.get('price')?.value || 0,
-          publisher: this.Bookform.get('publisher')?.value || '',
-          publicationDate: this.Bookform.get('publicationDate')?.value || '',
+          // Ensure price is handled, assuming backend sends a number or undefined/null
+          price:
+            typeof extractedData.price === 'number'
+              ? extractedData.price
+              : this.Bookform.get('price')?.value || 0,
+          publisher: extractedData.publisher || '',
+          publicationDate: extractedData.publicationDate || '',
         });
         // If autofill provides an image (Base64), set it and mark as touched
         if (extractedData.imageBase64) {
           this.imgSrc = extractedData.imageBase64;
           this.imageTouched = true;
         }
+
+        this.isLoading = false; // Set loading to false after successful API call
         this.bookService.setFeedbackMessage(
           '✅ PDF processed successfully! Form pre-filled. Please add a cover image if not provided.'
         );
@@ -223,14 +205,19 @@ export class BookFormComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         console.error('Error processing PDF for autofill:', err);
-        this.Bookform.reset(); // Reset form on error
-        this.imgSrc = '';
-        this.pdfFileForAutofill = null;
+        // Do NOT reset the form completely on autofill error; let user manually fill.
+        this.imgSrc = ''; // Clear any auto-generated image
+        this.pdfFileForAutofill = null; // Clear the autofill file input
         if (this.pdfAutofillInput) {
           this.pdfAutofillInput.nativeElement.value = '';
         }
-        this.imageTouched = false; // Reset touched state on error
-        // Error message is already set by service's handleError
+        this.imageTouched = false; // Reset touched state for image input on error
+        this.isLoading = false; // Set loading to false after API call (even on error)
+        // Error message is already set by service's handleError, just ensure it's shown.
+        this.bookService.setFeedbackMessage(
+          '❌ Failed to process PDF. Please enter details manually.'
+        );
+        this.bookService.scrollToTop(); // Scroll to top to show error message
       },
     });
   }
@@ -241,28 +228,35 @@ export class BookFormComponent implements OnInit, OnDestroy {
   onSubmit() {
     // Mark all form controls as touched to display validation errors
     this.Bookform.markAllAsTouched();
+    this.bookService.scrollToTop();
+
     this.imageTouched = true; // Mark image input as touched for validation
 
-    // Basic form validation check
+    // --- Client-side validation checks ---
     if (this.Bookform.invalid) {
       this.bookService.setFeedbackMessage(
         '❌ Please fill in all required fields correctly.'
       );
       this.bookService.scrollToTop();
-      return;
+      this.isLoading = false; // Ensure loading is off if validation fails
+      return; // Stop submission
     }
 
-    // Custom validation for cover image (if required by your business logic)
+    // Custom validation for cover image
     if (!this.imgSrc) {
       // If imgSrc is empty, it means no image was provided or processed
       this.bookService.setFeedbackMessage('❌ Cover image is required.');
       this.bookService.scrollToTop();
-      return;
+      this.isLoading = false; // Ensure loading is off if validation fails
+      return; // Stop submission
     }
+
+    // --- Proceed with submission if client-side validation passes ---
+    this.isLoading = true; // Set loading to true ONLY AFTER client-side validation passes
+    this.bookService.setFeedbackMessage('⏳ Adding book...');
 
     // --- IMPORTANT: Construct a BookData object (plain JavaScript object) ---
     // The BookService's submitBook method now expects this BookData object.
-    // The service itself will convert this into FormData for the HTTP request.
     const bookData: BookData = {
       title: this.Bookform.get('title')?.value,
       author: this.Bookform.get('author')?.value,
@@ -280,14 +274,15 @@ export class BookFormComponent implements OnInit, OnDestroy {
       'Frontend onSubmit: Is bookData.pdf an instance of File?',
       bookData.pdf instanceof File
     );
-    // --- END ADDED CONSOLE LOGS ---
     // --- Send the BookData object to the service ---
     // The service handles the FormData creation and HTTP request details.
     this.bookService.submitBook(bookData).subscribe({
+      // Call the correct method as per your service
       next: (response) => {
         console.log('Book submitted successfully!', response);
-        this.bookService.setFeedbackMessage('✅ Book submitted successfully!');
         this.bookService.scrollToTop();
+        this.bookService.setFeedbackMessage('✅ Book submitted successfully!');
+        this.isLoading = false; // Set loading to false on success
 
         // Reset the form and component state after successful submission
         this.Bookform.reset();
@@ -297,14 +292,15 @@ export class BookFormComponent implements OnInit, OnDestroy {
         this.imageTouched = false; // Reset touched state
         // Clear native file input elements
         if (this.imageInput) this.imageInput.nativeElement.value = '';
-        if (this.pdfInput) this.pdfInput.nativeElement.value = '';
+        if (this.pdfInput) this.pdfInput.nativeElement.value = ''; // Retained if you have this input in HTML
         if (this.pdfAutofillInput)
           this.pdfAutofillInput.nativeElement.value = '';
-        this.bookService.scrollToTop();
       },
       error: (error) => {
-        // Error message is already handled and set by the service's handleError method
         console.error('Error submitting book:', error);
+        this.isLoading = false; // Set loading to false on error
+        // Error message is already handled and set by the service's handleError method
+        this.bookService.scrollToTop();
       },
     });
   }
