@@ -1,1 +1,164 @@
-<p>book-list works!</p>
+
+<body class="bg-light">
+    <div class="book-list-container">
+        <div class="container py-5">
+            <div class="row justify-content-center">
+                <div class="col-12 col-xl-11">
+                    
+                    <!-- Page Header -->
+                    <div class="text-center mb-5">
+                        <h2 class="display-4 fw-bold gradient-text mb-3">
+                            <i class="bi bi-book-half me-3"></i>Available Books
+                        </h2>
+                        <p class="lead text-muted">Discover your next great read</p>
+                    </div>
+
+                    <!-- Success/Error Messages -->
+                    <div *ngIf="successMessage" 
+                         class="alert border-0 shadow-sm mb-4" 
+                         [class.alert-success]="successMessage.startsWith('✅')"
+                         [class.alert-danger]="successMessage.startsWith('❌')"
+                         role="alert">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-check-circle-fill me-3 fs-5" *ngIf="successMessage.startsWith('✅')"></i>
+                            <i class="bi bi-exclamation-triangle-fill me-3 fs-5" *ngIf="successMessage.startsWith('❌')"></i>
+                            <span class="fw-medium">{{ successMessage }}</span>
+                        </div>
+                    </div>
+
+                    <!-- No Books Message -->
+                    <div *ngIf="books.length === 0 && !isLoading" class="no-books-message">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body text-center py-5">
+                                <i class="bi bi-book display-1 text-primary mb-4 opacity-50"></i>
+                                <h4 class="card-title text-muted mb-3">No books found</h4>
+                                <p class="card-text text-muted mb-0">Why not add some books using the form above?</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Loading Spinner -->
+                    <div *ngIf="isLoading" class="loading-spinner">
+                        <div class="d-flex justify-content-center align-items-center py-5">
+                            <div class="spinner-border text-primary me-3" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <span class="h5 text-muted mb-0">Loading books...</span>
+                        </div>
+                    </div>
+
+                    <!-- Books List -->
+                    <div class="row g-4" *ngIf="books.length > 0">
+                        <div class="col-12" *ngFor="let book of books">
+                            <div class="card book-card border-0 shadow-sm h-100">
+                                <div class="card-body p-4">
+                                    <div class="row g-4">
+                                        
+                                        <!-- Book Cover -->
+                                        <div class="col-auto">
+                                            <div class="book-details-clickable-area" (click)="viewBookDetails(book._id!)">
+                                                <img *ngIf="book.coverImage" 
+                                                     [src]="book.coverImage" 
+                                                     [alt]="'Cover Image for ' + book.title" 
+                                                     class="book-cover img-fluid shadow-sm" 
+                                                     style="width: 90px; height: 135px; object-fit: cover;">
+                                                <img *ngIf="!book.coverImage" 
+                                                     src="assets/placeholder.png" 
+                                                     alt="No Cover Available" 
+                                                     class="book-cover img-fluid shadow-sm" 
+                                                     style="width: 90px; height: 135px; object-fit: cover;">
+                                            </div>
+                                        </div>
+
+                                        <!-- Book Details -->
+                                        <div class="col">
+                                            <div class="d-flex flex-column h-100">
+                                                <div class="flex-grow-1">
+                                                    
+                                                    <!-- Book Title -->
+                                                    <h3 class="card-title text-primary fw-bold mb-3 h4">{{ book.title }}</h3>
+                                                    
+                                                    <!-- Book Information Grid -->
+                                                    <div class="row g-3 mb-3">
+                                                        <div class="col-lg-6">
+                                                            <p class="mb-2 d-flex align-items-center">
+                                                                <i class="bi bi-person-fill text-primary me-2 fs-5"></i>
+                                                                <span><strong class="text-dark">Author:</strong> <span class="text-muted">{{ book.author }}</span></span>
+                                                            </p>
+                                                        </div>
+                                                        
+                                                        <div class="col-lg-6">
+                                                            <p class="mb-2 d-flex align-items-center">
+                                                                <i class="bi bi-tag-fill text-info me-2 fs-5"></i>
+                                                                <span><strong class="text-dark">Category:</strong> <span class="text-muted">{{ book.category }}</span></span>
+                                                            </p>
+                                                        </div>
+                                                        
+                                                        <div class="col-lg-6">
+                                                            <p class="mb-2 d-flex align-items-center">
+                                                                <i class="bi bi-currency-dollar text-success me-2 fs-5"></i>
+                                                                <span><strong class="text-dark">Price:</strong> <span class="text-success fw-bold">${{ book.price | number:'1.2-2' }}</span></span>
+                                                            </p>
+                                                        </div>
+                                                        
+                                                        <div class="col-lg-6" *ngIf="book.publisher">
+                                                            <p class="mb-2 d-flex align-items-center">
+                                                                <i class="bi bi-building text-secondary me-2 fs-5"></i>
+                                                                <span><strong class="text-dark">Publisher:</strong> <span class="text-muted">{{ book.publisher }}</span></span>
+                                                            </p>
+                                                        </div>
+                                                        
+                                                        <div class="col-12" *ngIf="book.publicationDate">
+                                                            <p class="mb-3 d-flex align-items-center">
+                                                                <i class="bi bi-calendar3 text-warning me-2 fs-5"></i>
+                                                                <span><strong class="text-dark">Published:</strong> <span class="text-muted">{{ book.publicationDate | date:'mediumDate' }}</span></span>
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <!-- Book Description -->
+                                                    <div class="mb-4">
+                                                        <p class="text-muted description-text mb-0 lh-base">{{ book.description }}</p>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Action Buttons -->
+                                                <div class="d-flex flex-wrap gap-2 align-items-center justify-content-between pt-3 border-top">
+                                                    <div class="d-flex flex-wrap gap-2">
+                                                        <a *ngIf="book.pdfUrl" 
+                                                           [href]="book.pdfUrl" 
+                                                           target="_blank" 
+                                                           class="btn btn-outline-info btn-sm px-3 py-2">
+                                                            <i class="bi bi-file-earmark-pdf me-2"></i>View PDF
+                                                        </a>
+                                                        <a [routerLink]="['/book-details', book._id!]" 
+                                                           class="btn btn-primary btn-sm px-3 py-2">
+                                                            <i class="bi bi-info-circle me-2"></i>View Details
+                                                        </a>
+                                                    </div>
+                                                    
+                                                    <div class="d-flex gap-2 ms-auto">
+                                                        <button class="btn btn-outline-warning btn-sm px-3 py-2" 
+                                                                (click)="editBook(book._id)">
+                                                            <i class="bi bi-pencil-square me-1"></i>Edit
+                                                        </button>
+                                                        <button class="btn btn-outline-danger btn-sm px-3 py-2" 
+                                                                (click)="deleteBook(book._id, book.title)">
+                                                            <i class="bi bi-trash me-1"></i>Delete
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
