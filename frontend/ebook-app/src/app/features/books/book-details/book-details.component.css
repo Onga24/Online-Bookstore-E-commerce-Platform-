@@ -1,0 +1,44 @@
+ .book-cover-large {
+            max-width: 100%;
+            height: auto;
+            max-height: 400px;
+            object-fit: cover;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+        .book-cover-large:hover {
+            transform: scale(1.02);
+        }
+        .star-rating .star {
+            color: #ddd;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .star-rating .star.filled {
+            color: #ffc107;
+        }
+        .star-rating .star:hover {
+            color: #ffc107;
+        }
+        .review-card {
+            transition: transform 0.2s ease;
+        }
+        .review-card:hover {
+            transform: translateY(-2px);
+        }
+        .rating-bar {
+            height: 8px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .rating-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #ffc107, #ff8c00);
+            transition: width 0.3s ease;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }

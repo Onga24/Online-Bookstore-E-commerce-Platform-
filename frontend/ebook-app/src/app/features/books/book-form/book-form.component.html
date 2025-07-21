@@ -1,0 +1,188 @@
+<head>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<div class="container my-5 p-4 shadow-lg rounded-3 bg-light position-relative">
+  <div *ngIf="isLoading" class="loading-overlay">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-2 text-primary">Processing, please wait...</p>
+  </div>
+
+  <h2 class="text-center mb-4 text-primary">Add New Book</h2>
+
+  <div *ngIf="successMessage" class="alert text-center fw-bold animated-fade-in"
+       [class.alert-success]="successMessage.startsWith('✅')"
+       [class.alert-danger]="successMessage.startsWith('❌')"
+       role="alert">
+    {{ successMessage }}
+  </div>
+
+  <form [formGroup]="Bookform" (ngSubmit)="onSubmit()">
+
+    <div class="card mb-4 shadow-sm">
+      <div class="card-header bg-primary text-white">
+        <h3 class="h5 mb-0">Book PDF File & Auto-fill (Optional)</h3>
+      </div>
+      <div class="card-body">
+        <p class="card-text text-muted mb-3">
+          Upload the book's PDF file here. This will also attempt to auto-fill book details from the PDF.
+        </p>
+        <div class="mb-3">
+          <label for="pdfUpload" class="form-label">Upload Book PDF:</label>
+          <input type="file" id="pdfUpload" class="form-control" (change)="onPdfUploadChange($event)"
+                 #pdfUploadInput accept="application/pdf" [disabled]="isLoading">
+          <div *ngIf="pdfFile" class="mt-2 small text-muted">
+            Selected PDF: {{ pdfFile.name }} ({{ (pdfFile.size / 1024 / 1024).toFixed(2) }} MB)
+            <button type="button" class="btn btn-sm btn-outline-danger ms-2" (click)="clearPdfFile()">Clear</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-4 shadow-sm">
+      <div class="card-header bg-primary text-white">
+        <h3 class="h5 mb-0">Cover Image</h3>
+      </div>
+      <div class="card-body">
+        <div class="mb-3">
+          <label for="image" class="form-label">Upload Cover Image <span class="text-danger">*</span>:</label>
+          <input type="file" id="image" class="form-control" (change)="onImageChange($event)"
+                 #imageInput accept="image/*" [disabled]="isLoading">
+          <div *ngIf="imageTouched && !imgSrc && !isLoading" class="text-danger small mt-1">
+            Cover image is required.
+          </div>
+        </div>
+        <div *ngIf="imgSrc" class="text-center border p-3 rounded bg-white mt-3">
+          <p class="text-muted mb-2">Image Preview:</p>
+          <img [src]="imgSrc" alt="Image Preview" class="img-fluid rounded shadow-sm" style="max-height: 200px;">
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-4 shadow-sm">
+      <div class="card-header bg-primary text-white">
+        <h3 class="h5 mb-0">Book Details</h3>
+      </div>
+      <div class="card-body">
+        <div class="mb-3">
+          <label for="title" class="form-label">Title <span class="text-danger">*</span>:</label>
+          <input id="title" type="text" formControlName="title" class="form-control" placeholder="Book Title"
+                 [readonly]="isLoading">
+          <div *ngIf="Bookform.get('title')?.invalid && Bookform.get('title')?.touched && !isLoading" class="text-danger small mt-1">
+            Title is required.
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="author" class="form-label">Author <span class="text-danger">*</span>:</label>
+          <input id="author" type="text" formControlName="author" class="form-control" placeholder="Author's Name"
+                 [readonly]="isLoading">
+          <div *ngIf="Bookform.get('author')?.invalid && Bookform.get('author')?.touched && !isLoading" class="text-danger small mt-1">
+            Author is required.
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="description" class="form-label">Description <span class="text-danger">*</span>:</label>
+          <textarea id="description" formControlName="description" class="form-control" placeholder="A brief description of the book" rows="4"
+                    [readonly]="isLoading"></textarea>
+          <div *ngIf="Bookform.get('description')?.invalid && Bookform.get('description')?.touched && !isLoading" class="text-danger small mt-1">
+            Description is required.
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="price" class="form-label">Price <span class="text-danger">*</span>:</label>
+          <input id="price" type="number" formControlName="price" class="form-control" placeholder="e.g., 29.99"
+                 [readonly]="isLoading">
+          <div *ngIf="Bookform.get('price')?.invalid && Bookform.get('price')?.touched && !isLoading" class="text-danger small mt-1">
+            Price is required and must be a positive number.
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="category" class="form-label">Category <span class="text-danger">*</span>:</label>
+          <input id="category" type="text" formControlName="category" class="form-control" placeholder="e.g., Science Fiction, Fantasy"
+                 [readonly]="isLoading">
+          <div *ngIf="Bookform.get('category')?.invalid && Bookform.get('category')?.touched && !isLoading" class="text-danger small mt-1">
+            Category is required.
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="publisher" class="form-label">Publisher <span class="text-danger">*</span>:</label>
+          <input id="publisher" type="text" formControlName="publisher" class="form-control" placeholder="Publisher Name"
+                 [readonly]="isLoading">
+          <div *ngIf="Bookform.get('publisher')?.invalid && Bookform.get('publisher')?.touched && !isLoading" class="text-danger small mt-1">
+            Publisher is required.
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="publicationDate" class="form-label">Publication Date <span class="text-danger">*</span>:</label>
+          <input id="publicationDate" type="date" formControlName="publicationDate" class="form-control"
+                 [readonly]="isLoading">
+          <div *ngIf="Bookform.get('publicationDate')?.invalid && Bookform.get('publicationDate')?.touched && !isLoading" class="text-danger small mt-1">
+            Publication Date is required.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="d-flex justify-content-end pt-3 border-top mt-4">
+      <button type="submit" class="btn btn-primary btn-lg" [disabled]="isLoading">
+        <i class="bi bi-plus-circle me-2"></i> Add Book
+      </button>
+    </div>
+  </form>
+
+  <button *ngIf="showScrollTop" class="btn btn-dark rounded-circle scroll-to-top-btn shadow-lg" (click)="scrollToTop()">
+  <i class="material-icons">arrow_upward</i> </button>
+</div>
+
+<style>
+  .animated-fade-in {
+    animation: fadeIn 0.5s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Custom style for the scroll-to-top button */
+  .scroll-to-top-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 55px;
+    height: 55px;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000; /* Ensure it's above other content */
+  }
+
+  /* NEW: Styles for the loading overlay */
+  .loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 1001; /* Higher than other content */
+    border-radius: inherit; /* Inherit border-radius from parent container */
+  }
+  .loading-overlay .spinner-border {
+    width: 4rem;
+    height: 4rem;
+    border-width: 0.4em;
+  }
+</style>
