@@ -11,5 +11,5 @@ export const routes: Routes = [
     {path: 'category' , component: CategoryComponent},
     {path: 'wishlist' , component: WishlistComponent},
     {path: 'cart' , component: CartComponent},
-    {path: '**' , component: HomeComponent}
+    {path: '**' , component: HomeComponent},
   ]
