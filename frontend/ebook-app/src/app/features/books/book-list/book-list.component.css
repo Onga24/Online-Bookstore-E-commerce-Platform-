@@ -1,0 +1,37 @@
+  .book-cover {
+            transition: transform 0.2s ease;
+            border-radius: 8px;
+        }
+        .book-cover:hover {
+            transform: scale(1.05);
+        }
+        .book-card {
+            transition: all 0.3s ease;
+        }
+        .book-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+        }
+        .gradient-text {
+            background: linear-gradient(45deg, #007bff, #6610f2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .book-details-clickable-area {
+            cursor: pointer;
+        }
+        .description-text {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.4;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .book-card {
+            animation: fadeIn 0.5s ease;
+        }

@@ -1,0 +1,180 @@
+<div class="container my-5 p-4 shadow-lg rounded-3 bg-light">
+  <h2 class="text-center mb-4 text-primary">Edit Book</h2>
+
+  <div *ngIf="successMessage" class="alert text-center fw-bold animated-fade-in"
+       [class.alert-success]="successMessage.startsWith('✅')"
+       [class.alert-danger]="successMessage.startsWith('❌')"
+       role="alert">
+    {{ successMessage }}
+  </div>
+
+  <div *ngIf="isLoading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-3 text-muted">Loading book details...</p>
+  </div>
+
+  <form *ngIf="!isLoading" [formGroup]="editBookForm" (ngSubmit)="onSubmit()">
+
+    <div class="card mb-4 shadow-sm">
+      <div class="card-header bg-primary text-white">
+        <h3 class="h5 mb-0">Cover Image</h3>
+      </div>
+      <div class="card-body">
+        <div class="mb-3">
+          <label class="form-label d-block mb-3">Current Cover Image:</label>
+          <div *ngIf="currentCoverImageUrl && !imgSrc" class="text-center border p-3 rounded bg-white">
+            <img [src]="currentCoverImageUrl" alt="Current Image" class="img-fluid rounded shadow-sm mb-3" style="max-height: 200px;">
+            <button type="button" class="btn btn-outline-danger btn-sm" (click)="clearImage()">
+              <i class="bi bi-x-circle me-1"></i> Clear Image
+            </button>
+          </div>
+          <div *ngIf="imgSrc && !imgSrc.startsWith('http')" class="text-center border p-3 rounded bg-white">
+            <p class="text-muted mb-2">New Image Preview:</p>
+            <img [src]="imgSrc" alt="New Image Preview" class="img-fluid rounded shadow-sm mb-3" style="max-height: 200px;">
+            <button type="button" class="btn btn-outline-danger btn-sm" (click)="clearImage()">
+              <i class="bi bi-x-circle me-1"></i> Clear New Image
+            </button>
+          </div>
+          <div *ngIf="!currentCoverImageUrl && !imgSrc" class="text-center text-muted border p-3 rounded bg-light">
+            <p class="mb-0">No current cover image. Upload one below.</p>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="imageUpload" class="form-label">Upload New Cover Image (Optional):</label>
+          <input type="file" id="imageUpload" class="form-control" (change)="onImageChange($event)" #imageInput accept="image/*">
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-4 shadow-sm">
+      <div class="card-header bg-primary text-white">
+        <h3 class="h5 mb-0">Full Book PDF</h3>
+      </div>
+      <div class="card-body">
+        <div class="mb-3">
+          <label class="form-label d-block mb-3">Current PDF:</label>
+          <div *ngIf="currentPdfUrl && !pdfFile" class="d-flex align-items-center justify-content-center flex-wrap gap-2 border p-3 rounded bg-white">
+            <a [href]="currentPdfUrl" target="_blank" class="btn btn-outline-info btn-sm">
+              <i class="bi bi-file-earmark-pdf me-1"></i> View Current PDF
+            </a>
+            <button type="button" class="btn btn-outline-danger btn-sm" (click)="clearPdf()">
+              <i class="bi bi-x-circle me-1"></i> Clear PDF
+            </button>
+          </div>
+          <div *ngIf="pdfFile" class="d-flex align-items-center justify-content-center flex-wrap gap-2 border p-3 rounded bg-white">
+            <p class="mb-0 me-2 text-muted">New PDF selected: <strong>{{ pdfFile.name }}</strong></p>
+            <button type="button" class="btn btn-outline-danger btn-sm" (click)="clearPdf()">
+              <i class="bi bi-x-circle me-1"></i> Clear New PDF
+            </button>
+          </div>
+          <div *ngIf="!currentPdfUrl && !pdfFile" class="text-center text-muted border p-3 rounded bg-light">
+            <p class="mb-0">No current PDF file. Upload one below.</p>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="pdfUpload" class="form-label">Upload New PDF (Optional):</label>
+          <input type="file" id="pdfUpload" class="form-control" (change)="onPDFChange($event)" #pdfInput accept="application/pdf">
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-4 shadow-sm">
+      <div class="card-header bg-primary text-white">
+        <h3 class="h5 mb-0">Book Details</h3>
+      </div>
+      <div class="card-body">
+        <div class="mb-3">
+          <label for="title" class="form-label">Title:</label>
+          <input id="title" type="text" formControlName="title" class="form-control" placeholder="Book Title">
+          <div *ngIf="editBookForm.get('title')?.invalid && editBookForm.get('title')?.touched" class="text-danger small mt-1">
+            Title is required.
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="author" class="form-label">Author:</label>
+          <input id="author" type="text" formControlName="author" class="form-control" placeholder="Author's Name">
+          <div *ngIf="editBookForm.get('author')?.invalid && editBookForm.get('author')?.touched" class="text-danger small mt-1">
+            Author is required.
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="description" class="form-label">Description:</label>
+          <textarea id="description" formControlName="description" class="form-control" placeholder="A brief description of the book" rows="4"></textarea>
+          <div *ngIf="editBookForm.get('description')?.invalid && editBookForm.get('description')?.touched" class="text-danger small mt-1">
+            Description is required.
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="price" class="form-label">Price:</label>
+          <input id="price" type="number" formControlName="price" class="form-control" placeholder="e.g., 29.99">
+          <div *ngIf="editBookForm.get('price')?.invalid && editBookForm.get('price')?.touched" class="text-danger small mt-1">
+            Price is required and must be a positive number.
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="category" class="form-label">Category:</label>
+          <input id="category" type="text" formControlName="category" class="form-control" placeholder="e.g., Science Fiction, Fantasy">
+          <div *ngIf="editBookForm.get('category')?.invalid && editBookForm.get('category')?.touched" class="text-danger small mt-1">
+            Category is required.
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="publisher" class="form-label">Publisher:</label>
+          <input id="publisher" type="text" formControlName="publisher" class="form-control" placeholder="Publisher Name">
+        </div>
+
+        <div class="mb-3">
+          <label for="publicationDate" class="form-label">Publication Date:</label>
+          <input id="publicationDate" type="date" formControlName="publicationDate" class="form-control">
+        </div>
+      </div>
+    </div>
+
+    <div class="d-flex justify-content-end pt-3 border-top mt-4">
+      <button type="submit" class="btn btn-primary btn-lg me-2">
+        <i class="bi bi-save me-2"></i> Update Book
+      </button>
+      <button type="button" class="btn btn-secondary btn-lg" (click)="goBack()">
+        <i class="bi bi-x-circle me-2"></i> Cancel
+      </button>
+    </div>
+  </form>
+
+  <button *ngIf="showScrollTop" class="btn btn-dark rounded-circle scroll-to-top-btn shadow-lg" (click)="scrollToTop()">
+    <i class="bi bi-arrow-up"></i>
+  </button>
+</div>
+
+<style>
+  .animated-fade-in {
+    animation: fadeIn 0.5s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Custom style for the scroll-to-top button */
+  .scroll-to-top-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 55px;
+    height: 55px;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000; /* Ensure it's above other content */
+  }
+</style>

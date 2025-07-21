@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // const express = require("express");
 // const router = express.Router();
 // const bookController = require("../controllers/book.controller");
@@ -6,6 +7,8 @@
 // router.get("/", bookController.getAllBooks);
 
 // module.exports = router;
+=======
+>>>>>>> feature/my-aws-s3-integration
 const express = require("express");
 const router = express.Router();
 const bookController = require("../controllers/book.controller");
@@ -13,4 +16,8 @@ const bookController = require("../controllers/book.controller");
 router.post("/add", bookController.addBook);
 router.get("/", bookController.getAllBooks);
 
+<<<<<<< HEAD
 module.exports = router;
+=======
+module.exports = router;
+>>>>>>> feature/my-aws-s3-integration

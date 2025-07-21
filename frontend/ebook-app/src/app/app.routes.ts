@@ -12,10 +12,20 @@ import { WishlistComponent } from './features/wishlist/wishlist.component';
 import { PaymentSummaryComponent } from './features/shopping-cart/payment-summary/payment-summary.component';
 import { CartComponent } from './features/shopping-cart/cart/cart.component';
 import { OrdersItemsComponent } from './features/shopping-cart/orders-items/orders-items.component';
+import { BookListComponent } from './features/books/book-list/book-list.component'; // Adjust path if necessary
+import { BookFormComponent } from './features/books/book-form/book-form.component'; // <-- You'll need to create this component or use an existing one for your form
+import { EditBookComponent } from './features/books/edit-book/edit-book.component'; // <--- Updated path
+import { BookDetailsComponent } from './features/books/book-details/book-details.component';
+
 
 
 export const routes: Routes = [
     {path: '' , component: HomeComponent},
+    { path: 'list', component: BookListComponent },
+  { path: 'books', component: BookListComponent },
+  { path: 'add-book', component: BookFormComponent },
+  { path: 'edit-book/:id', component: EditBookComponent },
+  { path: 'book-details/:id', component: BookDetailsComponent },
     {path: 'home' , component: HomeComponent},
     {path: 'category' , component: CategoryComponent},
     {path: 'wishlist' , component: WishlistComponent},
