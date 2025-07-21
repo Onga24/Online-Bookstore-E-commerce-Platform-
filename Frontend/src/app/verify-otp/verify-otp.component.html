@@ -1,0 +1,58 @@
+<div class="wrapper">
+  <div class="login-content">
+    <div class="container">
+      <div
+        class="row d-flex align-items-center justify-content-center vh-100 w-100 m-0"
+      >
+        <div class="col-lg-5 col-md-12 align-self-center bg-primary py-3">
+          <div class="card p-0 mb-0">
+            <div class="card-body auth-card">
+              <div class="logo-img text-center mb-3">
+                <img
+                  src="assets/images/logo-white.png"
+                  height="30"
+                  alt="logo"
+                />
+              </div>
+              <h1 class="text-primary reset-pw fw-900 text-center">
+                Email Verification
+              </h1>
+              <p class="text-center mb-4 auth-desc">
+                Enter the verification code sent to your email.
+              </p>
+              <form [formGroup]="otpForm" (ngSubmit)="submit()">
+                <div class="custom-form-field mb-4">
+                  <label>Verification Code <span>*</span></label>
+                  <input
+                    type="text"
+                    formControlName="code"
+                    class="form-control text-center"
+                    maxlength="6"
+                  />
+                  <div
+                    class="text-danger"
+                    *ngIf="fc['code'].errors && isSubmitted"
+                  >
+                    <div *ngIf="fc['code'].errors['required']">
+                      Code is required
+                    </div>
+                  </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">
+                  Verify
+                </button>
+              </form>
+              <div class="auth-signup mt-4 text-center">
+                <p>
+                  Didn’t get the code?
+                  <a href="#">Resend</a>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

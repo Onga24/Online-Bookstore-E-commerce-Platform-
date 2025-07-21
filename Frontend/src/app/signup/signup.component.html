@@ -1,0 +1,263 @@
+<div class="wrapper">
+  <div class="login-content">
+    <div class="container">
+      <div
+        class="row d-flex align-items-center justify-content-center vh-100 w-100 m-0"
+      >
+        <div class="col-lg-5 col-md-12 align-self-center bg-primary py-3">
+          <div class="card p-0 mb-0">
+            <div class="card-body auth-card">
+              <div class="logo-img">
+                <div class="logo-img">
+                  <a
+                    href=""
+                    class="navbar-brand d-flex align-items-center mb-2 justify-content-center"
+                  >
+                    <!--Logo start-->
+                    <div class="logo-main auth-logo">
+                      <img
+                        class="logo-normal"
+                        src="assets/images/logo.png"
+                        height="30"
+                        alt="logo"
+                      />
+                      <img
+                        class="logo-color"
+                        src="assets/images/logo-white.png"
+                        height="30"
+                        alt="logo"
+                      />
+                      <img
+                        class="logo-mini"
+                        src="assets/images/logo-mini.png"
+                        alt="logo"
+                      />
+                      <img
+                        class="logo-mini-white"
+                        src="assets/images/logo-mini-white.png"
+                        alt="logo"
+                      />
+                    </div>
+                  </a>
+                </div>
+                <h1
+                  class="text-primary reset-pw fw-900 d-flex ms-3 justify-content-center"
+                >
+                  Sign Up
+                </h1>
+                <div class="social-login-buttons mb-4 text-center">
+                  <p class="mb-3">Or sign up with</p>
+                  <button
+                    (click)="socialSignUp('google')"
+                    class="btn btn-outline-danger me-2"
+                  >
+                    <img
+                      src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg"
+                      alt="Google"
+                      style="width: 20px; margin-right: 8px"
+                    />
+                    Sign up with Google
+                  </button>
+                  <button
+                    (click)="socialSignUp('github')"
+                    class="btn btn-outline-dark mt-2"
+                  >
+                    <img
+                      src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg"
+                      alt="GitHub"
+                      style="width: 20px; margin-right: 8px"
+                    />
+                    Sign up with GitHub
+                  </button>
+                  <button
+                    (click)="socialSignUp('facebook')"
+                    class="btn btn-outline-primary mt-2"
+                  >
+                    <img
+                      src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/facebook/facebook-original.svg"
+                      alt="Facebook"
+                      style="width: 20px; margin-right: 8px"
+                    />
+                    Sign up with Facebook
+                  </button>
+                </div>
+                <form
+                  [formGroup]="registerForm"
+                  (ngSubmit)="submit()"
+                  novalidate
+                >
+                  <div class="custom-form-field mb-3 mt-2">
+                    <label>Your First Name: <span>*</span> </label>
+                    <input
+                      type="text"
+                      name="firstName"
+                      class="form-control"
+                      required=""
+                      formControlName="firstName"
+                    />
+                    <div
+                      class="text-danger"
+                      *ngIf="fc['firstName'].errors && isSubmitted"
+                    >
+                      <div *ngIf="fc['firstName'].errors['required']">
+                        FirstName Should be not empty
+                      </div>
+                      <div *ngIf="fc['firstName'].errors['minlength']">
+                        FirstName Should be atleast 5 character
+                      </div>
+                    </div>
+                  </div>
+                  <div class="custom-form-field mb-3 mt-2">
+                    <label>Your Last Name: <span>*</span> </label>
+                    <input
+                      type="text"
+                      name="lastName"
+                      class="form-control"
+                      required=""
+                      formControlName="lastName"
+                    />
+                    <div
+                      class="text-danger"
+                      *ngIf="fc['lastName'].errors && isSubmitted"
+                    >
+                      <div *ngIf="fc['lastName'].errors['required']">
+                        LastName Should be not empty
+                      </div>
+                      <div *ngIf="fc['lastName'].errors['minlength']">
+                        LastName Should be atleast 5 character
+                      </div>
+                    </div>
+                  </div>
+                  <div class="custom-form-field mb-3 mt-2">
+                    <label>Email Address: <span>*</span> </label>
+                    <input
+                      type="email"
+                      name="email"
+                      class="form-control"
+                      required=""
+                      formControlName="email"
+                    />
+                    <div
+                      class="text-danger"
+                      *ngIf="fc['email'].errors && isSubmitted"
+                    >
+                      <div *ngIf="fc['email'].errors['required']">
+                        Email Should be not empty
+                      </div>
+                      <div *ngIf="fc['email'].errors['email']">
+                        Should be email
+                      </div>
+                    </div>
+                  </div>
+                  <div class="custom-form-field mb-3 mt-2">
+                    <label>Address: <span>*</span> </label>
+                    <input
+                      type="text"
+                      name="address"
+                      class="form-control"
+                      required=""
+                      formControlName="address"
+                    />
+
+                    <div
+                      class="text-danger"
+                      *ngIf="fc['address'].errors && isSubmitted"
+                    >
+                      <div *ngIf="fc['address'].errors['required']">
+                        Address Should be not empty
+                      </div>
+                      <div *ngIf="fc['address'].errors['minlength']">
+                        Address Should be atleast 10 character
+                      </div>
+                    </div>
+                  </div>
+                  <div class="custom-form-field mb-3 mt-2">
+                    <label>Password: <span>*</span> </label>
+                    <input
+                      type="password"
+                      name="password"
+                      class="form-control"
+                      required=""
+                      formControlName="password"
+                    />
+                    <div
+                      class="text-danger"
+                      *ngIf="fc['password'].errors && isSubmitted"
+                    >
+                      <div *ngIf="fc['password'].errors['required']">
+                        Password Should be not empty
+                      </div>
+                      <div *ngIf="fc['password'].errors['minlength']">
+                        Password Should be atleast 5 character
+                      </div>
+                    </div>
+                  </div>
+                  <div class="custom-form-field mb-3 mt-2">
+                    <label>Confirm Password: <span>*</span> </label>
+                    <input
+                      type="password"
+                      name="confirmPassword"
+                      class="form-control"
+                      required=""
+                      formControlName="confirmPassword"
+                    />
+                    <div
+                      class="text-danger"
+                      *ngIf="fc['confirmPassword'].errors && isSubmitted"
+                    >
+                      <div *ngIf="fc['confirmPassword'].errors['required']">
+                        Confirm Password Should be not empty
+                      </div>
+                      <div *ngIf="fc['confirmPassword'].errors['notMatch']">
+                        Confirm password does not match
+                      </div>
+                    </div>
+                  </div>
+                  <div class="custom-form-field mb-3">
+                    <input
+                      type="checkbox"
+                      name="confirm-password"
+                      class=""
+                      required=""
+                    />
+                    <label
+                      >I accept
+                      <a href="../extra-pages/terms-of-service.html"
+                        >terms and condition.</a
+                      >
+                    </label>
+                  </div>
+
+                  <button type="submit" class="btn btn-primary w-100">
+                    <span
+                      class="btn-inner d-flex align-items-center justify-content-center gap-2"
+                    >
+                      <span
+                        class="text-center d-inline-block align-middle width-full"
+                        >Sign Up</span
+                      >
+                      <i class="ph ph-plus custom-ph-icons"></i>
+                    </span>
+                  </button>
+                </form>
+                <div
+                  class="d-flex align-items-center mt-5 justify-content-center auth-signup"
+                >
+                  <p class="text-center mb-0">
+                    Already a user?
+                    <a
+                      [routerLink]="['/signin']"
+                      [queryParams]="{ returnUrl: returnUrl }"
+                      class="ms-2"
+                      >Sign In</a
+                    >
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,150 @@
+<!-- loader Start -->
+<!-- <div id="loading">
+  <div class="loader simple-loader">
+    <div class="loader-body">
+      <img
+        src="assets/images/loader.gif"
+        alt="loader"
+        class="light-loader img-fluid"
+        width="200"
+      />
+    </div>
+  </div>
+</div> -->
+<!-- loader END -->
+<div class="wrapper">
+  <div class="login-content">
+    <div class="container">
+      <div
+        class="row d-flex align-items-center justify-content-center vh-100 w-100 m-0"
+      >
+        <div class="col-lg-5 col-md-12 align-self-center bg-primary py-3">
+          <div class="card p-0 mb-0">
+            <div class="card-body auth-card">
+              <div class="logo-img">
+                <a
+                  href="../index.html"
+                  class="navbar-brand d-flex align-items-center mb-2 justify-content-center"
+                >
+                  <!--Logo start-->
+                  <div class="logo-main auth-logo">
+                    <img
+                      class="logo-normal"
+                      src="assets/images/logo.png"
+                      height="30"
+                      alt="logo"
+                    />
+                    <img
+                      class="logo-color"
+                      src="assets/images/logo-white.png"
+                      height="30"
+                      alt="logo"
+                    />
+                    <img
+                      class="logo-mini"
+                      src="assets/images/logo-mini.png"
+                      alt="logo"
+                    />
+                    <img
+                      class="logo-mini-white"
+                      src="assets/images/logo-mini-white.png"
+                      alt="logo"
+                    />
+                  </div>
+                  <!--logo End-->
+                </a>
+              </div>
+              <h1
+                class="text-primary reset-pw fw-900 d-flex ms-3 justify-content-center"
+              >
+                Sign In
+              </h1>
+              <p class="text-center mb-4 auth-desc">
+                Enter your email address and password to access admin panel.
+              </p>
+              <form [formGroup]="loginForm" (ngSubmit)="submit()">
+                <div class="custom-form-field mb-5 mt-2">
+                  <label>Email Address� <span>*</span> </label>
+                  <input
+                    type="text"
+                    name="user-name"
+                    class="form-control"
+                    required=""
+                    formControlName="email"
+                  />
+                  <div
+                    class="text-danger"
+                    *ngIf="fc['email'].errors && isSubmitted"
+                  >
+                    <div *ngIf="fc['email'].errors['required']">
+                      Email Should be not empty
+                    </div>
+                    <div *ngIf="fc['email'].errors['email']">
+                      Should be email
+                    </div>
+                  </div>
+                </div>
+                <div class="custom-form-field mb-5 mt-2">
+                  <label>Password� <span>*</span> </label>
+                  <input
+                    type="password"
+                    name="pwd"
+                    class="form-control"
+                    required=""
+                    formControlName="password"
+                  />
+                  <div
+                    class="text-danger"
+                    *ngIf="fc['password'].errors && isSubmitted"
+                  >
+                    <div *ngIf="fc['password'].errors['required']">
+                      Password Should be not empty
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="d-flex align-items-center justify-content-between mb-5"
+                >
+                  <div class="form-check">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      id="remember"
+                      required="required"
+                    />
+                    <label class="form-check-label" for="remember">
+                      Remember Me
+                    </label>
+                  </div>
+                  <a [routerLink]="['/forgot-password']" class="forgot-pwd">
+                    Forgot Password?
+                  </a>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">
+                  <span
+                    class="btn-inner d-flex align-items-center justify-content-center gap-2"
+                  >
+                    <span class="text d-inline-block align-middle width-full"
+                      >Sign In</span
+                    >
+                    <i class="ph ph-plus custom-ph-icons"></i>
+                  </span>
+                </button>
+              </form>
+              <div class="auth-signup mt-5">
+                <p class="d-flex justify-content-center mb-0">
+                  Don't Have An Account Yet?<a
+                    [routerLink]="['/signup']"
+                    [queryParams]="{ returnUrl: returnUrl }"
+                    class="ms-2"
+                    >Sign Up.</a
+                  >
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
