@@ -10,7 +10,7 @@ import { FavoriteReadsComponent } from '../favorite-reads/favorite-reads.compone
   standalone: true,
   imports: [SwiperComponent, BrowseBooksComponent,FeaturedBooksComponent, FeaturedWriterComponent, FavoriteReadsComponent],
   templateUrl: './home.component.html',
-  styleUrl: './home.component.css'
+  styleUrls: ['./home.component.css']
 })
 export class HomeComponent {
 

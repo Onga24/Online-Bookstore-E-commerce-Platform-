@@ -1,29 +1,18 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-search',
   standalone: true,
-  imports: [],
+  imports: [CommonModule, FormsModule],
   templateUrl: './search.component.html',
-  styleUrls: ['./search.component.css',
-            '../../../../assets/css/booksto.min.css',
-            '../../../../assets/css/custom.min.css',
-            '../../../../assets/css/customizer.min.css',
-            '../../../../assets/css/flaticon.css',
-            '../../../../assets/css/font-awesome.min.css',
-            '../../../../assets/css/ionicons.min.css',
-            '../../../../assets/css/line-awesome.min.css',
-            '../../../../assets/css/libs.min.css',
-            '../../../../assets/css/remixicon.css',
-            '../../../../assets/css/style.css',
-            '../../../../assets/css/rtl.min.css',
-            '../../../../assets/css/style_1.css',
-            '../../../../assets/css/style_2.css',
-            '../../../../assets/css/webfont.css'
-            ],
-              encapsulation: ViewEncapsulation.None,
-            
+  styleUrls: ['./search.component.css'],
 })
 export class SearchComponent {
+
+
+  constructor() {}
+
 
 }

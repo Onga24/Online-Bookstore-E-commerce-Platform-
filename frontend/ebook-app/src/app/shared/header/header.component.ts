@@ -30,6 +30,8 @@ declare var bootstrap: any;
 
 })
 export class HeaderComponent implements AfterViewInit {
+
+  logged_in = false;
   ngAfterViewInit(): void {
     if (typeof window !== 'undefined') {
       const dropdownTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="dropdown"]'));
