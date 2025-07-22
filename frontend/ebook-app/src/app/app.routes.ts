@@ -11,7 +11,7 @@ import { CategoryComponent } from './features/Category/category/category.compone
 import { WishlistComponent } from './features/wishlist/wishlist.component';
 import { PaymentSummaryComponent } from './features/shopping-cart/payment-summary/payment-summary.component';
 import { CartComponent } from './features/shopping-cart/cart/cart.component';
-import { OrdersItemsComponent } from './features/shopping-cart/orders-items/orders-items.component';
+import { OrderItemsComponent } from './features/shopping-cart/orders-items/orders-items.component';
 
 
 export const routes: Routes = [
@@ -24,6 +24,6 @@ export const routes: Routes = [
     {path: 'side' , component: SidebarComponent},
     {path: 'foot' , component: FooterComponent},
     {path: 'cart' , component: CartComponent},
-    { path: 'orders-items', component: OrdersItemsComponent },
+    { path: 'orders-items', component: OrderItemsComponent },
     {path: '**' , component: HomeComponent},
   ]

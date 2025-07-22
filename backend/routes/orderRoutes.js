@@ -17,16 +17,21 @@ const router = express.Router();
 const {
   createOrder,
   captureOrder,
-  getOrderItems
+  getOrderItems,
+  getAllOrders,
 } = require("../controllers/orderController");
 
 // Create new order
 router.post("/create", createOrder);
 
+// Get order items
+router.get("/items/:orderId", getOrderItems);
+
+//router.get("/items", getAllOrders);
+
 // Capture payment for order
 router.post("/capture", captureOrder);
 
-// Get order items
-router.get("/items/:orderId", getOrderItems);
+
 
 module.exports = router;

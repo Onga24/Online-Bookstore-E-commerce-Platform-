@@ -1,0 +1,26 @@
+.paypal-btn {
+  background-color: #ffc439; /* Yellow PayPal color */
+  border: none;
+  border-radius: 6px;
+  padding: 12px 24px;
+  width: 100%;
+  text-align: center;
+  cursor: pointer;
+}
+
+.paypal-text {
+  font-family: Arial, sans-serif;
+  font-weight: bold;
+  font-size: 1.25rem;
+  display: inline-block;
+}
+
+.paypal-dark {
+  color: #003087; /* Dark blue for "Pay" */
+  font-style: italic;
+}
+
+.paypal-blue {
+  color: #009cde; /* Light blue for "Pal" */
+  font-style: italic;
+}
